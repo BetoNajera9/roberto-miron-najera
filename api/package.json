@@ -75,6 +75,7 @@
 		"moduleNameMapper": {
 			"@product/(.*)": "<rootDir>/product/$1",
 			"@common/(.*)": "<rootDir>/common/$1",
+			"@user/(.*)": "<rootDir>/user/$1",
 			"@db/(.*)": "<rootDir>/db/$1"
 		}
 	}

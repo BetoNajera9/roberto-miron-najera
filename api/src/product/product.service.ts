@@ -28,8 +28,10 @@ export class ProductService {
 		if (!products.length)
 			throw new NotFoundException(ErrorResponseEnum.NOT_FOUND)
 
+		const count = await this.dbService.catalogProducts.count()
+
 		const pageMetaDto = new PageMetaDto({
-			itemCount: products.length,
+			itemCount: count,
 			pageOptionsDto: pageOptions,
 		})
 

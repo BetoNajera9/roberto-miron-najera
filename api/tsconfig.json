@@ -20,6 +20,7 @@
 		"paths": {
 			"@product/*": ["src/product/*"],
 			"@common/*": ["src/common/*"],
+			"@user/*": ["src/user/*"],
 			"@db/*": ["src/db/*"]
 		}
 	}

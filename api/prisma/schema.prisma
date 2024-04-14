@@ -30,7 +30,7 @@ model User {
   email               String    @unique
   password            String
   phone               String
-  imgProfile          String
+  imgProfile          String?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 }
