@@ -27,18 +27,18 @@ export class ResponseService {
 
 		return !code
 			? {
-				success,
-				statusCode: 'UNDEFINED_RESPONSE',
-				message: messageResponse,
-				data,
-				meta,
-			}
+					success,
+					statusCode: 'UNDEFINED_RESPONSE',
+					message: messageResponse,
+					data,
+					meta,
+				}
 			: {
-				success,
-				statusCode: code,
-				message: messageResponse,
-				data,
-				meta,
-			}
+					success,
+					statusCode: code,
+					message: messageResponse,
+					data,
+					meta,
+				}
 	}
 }
