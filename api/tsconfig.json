@@ -18,6 +18,8 @@
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
 		"paths": {
+			"@product/*": ["src/product/*"],
+			"@common/*": ["src/common/*"],
 			"@db/*": ["src/db/*"]
 		}
 	}
