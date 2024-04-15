@@ -18,9 +18,12 @@
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
 		"paths": {
+			"@access-token/*": ["src/access-token/*"],
 			"@product/*": ["src/product/*"],
 			"@common/*": ["src/common/*"],
+			"@auth/*": ["src/auth/*"],
 			"@user/*": ["src/user/*"],
+			"@server/*": ["src/*"],
 			"@db/*": ["src/db/*"]
 		}
 	}
