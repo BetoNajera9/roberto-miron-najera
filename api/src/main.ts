@@ -1,6 +1,6 @@
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { ValidationPipe } from '@nestjs/common'
-import { NestFactory } from '@nestjs/core'
+import { NestFactory, Reflector } from '@nestjs/core'
 
 import { HandlerError } from '@common/classes'
 
@@ -24,11 +24,18 @@ async function bootstrap() {
 	// Set api prefix
 	app.setGlobalPrefix('api')
 
+	// Activate @exclude class-transformer
+	const reflector = app.get(Reflector)
+
+	// Start interceptors
+	app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector))
+
 	//Set validation pipe
 	app.useGlobalPipes(
 		new ValidationPipe({
-			whitelist: true,
 			forbidNonWhitelisted: true,
+			whitelist: true,
+			transform: true,
 		})
 	)
 

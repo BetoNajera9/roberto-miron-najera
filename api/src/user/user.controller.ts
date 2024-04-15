@@ -2,6 +2,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { IsObjectIdPipe } from 'nestjs-object-id'
 import {
 	Controller,
+	UseGuards,
 	Delete,
 	Query,
 	Param,
@@ -12,13 +13,16 @@ import {
 } from '@nestjs/common'
 
 import { ResponseInterface } from '@common/interfaces'
+import { PublicAccess } from '@common/decorators'
 import { ResponseService } from '@common/classes'
 import { PageOptionsDto } from '@common/dto'
+import { AuthGuard } from '@auth/guards'
 
 import { CreateUserDto, UpdateUserDto } from './dto'
 import { UserService } from './user.service'
 import { UserResponseEnum } from './enums'
 
+@UseGuards(AuthGuard)
 @Controller('user')
 @ApiTags('User')
 export class UserController {
@@ -29,6 +33,7 @@ export class UserController {
 	}
 
 	@Post()
+	@PublicAccess()
 	@ApiOperation({
 		description: 'This endpoint creates the registration of a new user.',
 		summary: 'Register user',
@@ -68,7 +73,7 @@ export class UserController {
 		summary: 'Get a user by id',
 	})
 	async findOne(@Param('id') id: string) {
-		const user = await this.userService.findOne(id)
+		const user = await this.userService.findOne({ id })
 
 		return this.responseService.handlerResponse(
 			true,
@@ -77,14 +82,17 @@ export class UserController {
 		)
 	}
 
-	@Patch(':id')
+	@Patch()
 	@ApiOperation({
 		description:
 			'This endpoint updates my user data, which can be first name, last name and/or email address.',
 		summary: 'Update user',
 	})
-	async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-		const user = await this.userService.update(id, updateUserDto)
+	async update(
+		@Body() updateUserDto: UpdateUserDto,
+		@Param('userId') userId: string
+	) {
+		const user = await this.userService.update(userId, updateUserDto)
 
 		return this.responseService.handlerResponse(
 			true,
@@ -93,14 +101,14 @@ export class UserController {
 		)
 	}
 
-	@Delete(':id')
+	@Delete()
 	@ApiOperation({
 		description:
 			'This endpoint removes the user with the payload identifier from the access token.',
 		summary: 'Delete my user',
 	})
-	async remove(@Param('id', IsObjectIdPipe) id: string) {
-		const user = await this.userService.remove(id)
+	async remove(@Param('userId') userId: string) {
+		const user = await this.userService.remove(userId)
 
 		return this.responseService.handlerResponse(
 			true,
