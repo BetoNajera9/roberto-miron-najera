@@ -1,20 +1,34 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ConfigType } from '@nestjs/config'
+import * as Bcrypt from 'bcrypt'
 
+import { AccessTokenService } from '@access-token/access-token.service'
 import { PageDto, PageMetaDto, PageOptionsDto } from '@common/dto'
 import { ErrorResponseEnum } from '@common/enums'
 import { DbService } from '@db/db.service'
 
-import { CreateUserDto, UpdateUserDto } from './dto'
+import { CreateUserDto, FindUserDto, UpdateUserDto, UserDto } from './dto'
+import { config } from './user.config'
 
 @Injectable()
 export class UserService {
-	constructor(@Inject(DbService) private dbService: DbService) {}
+	constructor(
+		@Inject(config.KEY)
+		private readonly configUserService: ConfigType<typeof config>,
+		@Inject(AccessTokenService) private accessTokenService: AccessTokenService,
+		@Inject(DbService) private dbService: DbService
+	) {}
 
-	async create(data: CreateUserDto): Promise<CreateUserDto> {
+	async create(data: CreateUserDto): Promise<UserDto> {
+		data.password = await Bcrypt.hash(
+			data.password,
+			this.configUserService.saltRounds
+		)
+
 		return await this.dbService.user.create({ data })
 	}
 
-	async findAll(pageOptions: PageOptionsDto): Promise<PageDto<CreateUserDto>> {
+	async findAll(pageOptions: PageOptionsDto): Promise<PageDto<UserDto>> {
 		const users = await this.dbService.user.findMany({
 			skip: (pageOptions.page - 1) * pageOptions.take,
 			take: pageOptions.take,
@@ -35,9 +49,9 @@ export class UserService {
 		return new PageDto(users, pageMetaDto)
 	}
 
-	async findOne(id: string): Promise<CreateUserDto> {
-		const user = await this.dbService.user.findUnique({
-			where: { id },
+	async findOne(query: FindUserDto): Promise<UserDto> {
+		const user = await this.dbService.user.findFirst({
+			where: query,
 		})
 
 		if (!user) throw new NotFoundException(ErrorResponseEnum.NOT_FOUND)
@@ -45,8 +59,8 @@ export class UserService {
 		return user
 	}
 
-	async update(id: string, data: UpdateUserDto): Promise<CreateUserDto> {
-		await this.findOne(id)
+	async update(id: string, data: UpdateUserDto): Promise<UserDto> {
+		await this.findOne({ id })
 
 		return await this.dbService.user.update({
 			where: { id },
@@ -54,8 +68,10 @@ export class UserService {
 		})
 	}
 
-	async remove(id: string): Promise<CreateUserDto> {
-		await this.findOne(id)
+	async remove(id: string): Promise<UserDto> {
+		await this.findOne({ id })
+
+		await this.accessTokenService.remove({ userId: id })
 
 		return await this.dbService.user.delete({
 			where: { id },
