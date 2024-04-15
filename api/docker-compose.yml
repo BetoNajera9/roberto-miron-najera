@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  mongo_db:
+    build:
+      context: ./mongodb-rs
+      args:
+        MONGO_VERSION: 6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_REPLICA_HOST: ${MONGO_REPLICA_HOST}
+      MONGO_REPLICA_PORT: ${MONGO_REPLICA_PORT}
+      MONGO_COMMAND: 'mongosh'
+    ports:
+      - ${MONGO_REPLICA_PORT}:${MONGO_REPLICA_PORT}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          'admin',
+          '--port',
+          '${MONGO_REPLICA_PORT}',
+          '--eval',
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
