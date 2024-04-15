@@ -19,6 +19,7 @@
 		"noFallthroughCasesInSwitch": false,
 		"paths": {
 			"@access-token/*": ["src/access-token/*"],
+			"@shipment/*": ["src/shipment/*"],
 			"@product/*": ["src/product/*"],
 			"@common/*": ["src/common/*"],
 			"@auth/*": ["src/auth/*"],
